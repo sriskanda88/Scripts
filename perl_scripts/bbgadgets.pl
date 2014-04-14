@@ -6,7 +6,7 @@ use Cwd 'abs_path';
 use File::Path qw( rmtree );
 
 my %gadget_hash;
-my $out_path = "/home/sshamasu/scratch/";
+my $out_path = "/home/skanda/scratch/";
 
 sub main(){
 	my $bmobjdump = $ARGV[0];
@@ -106,9 +106,6 @@ sub buildGadgetHash(){
 	open FILE, "<$bmobjdump" or die "Unable to open objdump file, idiot";
 	
 	while ($line = <FILE>){
-#		chomp($line);
-
-#		if ($line =~ m/.*Lbuild.*/){
 		if ($line =~ m/\<.*\>:/){
 			$isPartOfGadget = 1;
 			$currBBaddr = (split(/ /,$line))[0];
@@ -116,7 +113,7 @@ sub buildGadgetHash(){
 			$currGadget = \@newGadget;	
 			push(@$currGadget, $line);
 		}
-		elsif (($line =~ m/mov.*pc.*lr/) && $isPartOfGadget){
+		elsif (($line =~ m/ret/) && $isPartOfGadget){
 			push(@$currGadget, $line);
 			my $gadget_size = (scalar (@$currGadget)) - 1;
 			$gadget_hash{$gadget_size}{$currBBaddr} = $currGadget;
