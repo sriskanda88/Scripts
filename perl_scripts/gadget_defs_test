@@ -1,0 +1,14 @@
+10427d77 <.Lbuild_tree.bc_.LBB131_6>:
+10427d77:       5b                      pop    %ebx
+10427d78:       c3                      ret
+
+100064c2 <.Lbuild_bzlib.bc_.LBB28_5>:
+100064c2:       83 c4 38                add    $0x38,%esp
+100064c5:       5e                      pop    %esi
+100064c6:       c3                      ret
+
+10003d57 <.Lbuild_bzlib.bc_.LBB9_2>:
+10003d57:       83 c4 04                add    $0x4,%esp
+10003d5a:       5e                      pop    %esi
+10003d5b:       5f                      pop    %edi
+10003d5c:       c3                      ret

@@ -1,0 +1,51 @@
+10427d77:       58                      pop    %eax
+10427d78:       c3                      ret
+
+1001edf1:     5b                      pop     %ebx
+1001edf2:     c3                      ret
+
+104662b0:       8b 1c 24                mov    (%esp),%ebx
+104662b3:       c3                      ret
+
+10000c6c:       59                      pop    %ecx
+10000c6d:       c3                      ret
+
+100331cb:       5a                      pop    %edx
+100331cc:       c3                      ret
+
+100c7e78:       5e                      pop    %esi
+100c7e79:       c3                      ret
+
+104124ae:       5f                      pop    %edi
+104124af:       c3                      ret
+
+104a5180:       8b 40 04                mov    0x4(%eax),%eax
+104a5183:       c3                      ret
+
+1012ecdc:       89 11                   mov    %edx,(%ecx)
+1012ecde:       83 c4 04                add    $0x4,%esp
+1012ece1:       5e                      pop    %esi
+1012ece2:       5f                      pop    %edi
+1012ece3:       c3                      ret
+
+10379664:       01 c1                   add    %eax,%ecx
+10379666:       89 0d 20 2b 02 17       mov    %ecx,0x17022b20
+1037966c:       83 c4 30                add    $0x30,%esp
+1037966f:       5e                      pop    %esi
+10379670:       c3                      ret
+
+10024982:       19 c0                   sbb    %eax,%eax
+10024984:       83 c4 0c                add    $0xc,%esp
+10024987:       c3                      ret
+
+102980b0:       0f 45 c2                cmovne %edx,%eax
+102980b3:       83 c4 1c                add    $0x1c,%esp
+102980b6:       c3                      ret
+
+1031c69f:       01 d0                   add    %edx,%eax
+1031c6a1:       83 c4 2c                add    $0x2c,%esp
+1031c6a4:       5e                      pop    %esi
+1031c6a5:       5f                      pop    %edi
+1031c6a6:       5b                      pop    %ebx
+1031c6a7:       5d                      pop    %ebp
+1031c6a8:       c3                      ret

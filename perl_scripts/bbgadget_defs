@@ -1,0 +1,80 @@
+10427d77 <.Lbuild_tree.bc_.LBB131_6>:
+10427d77:       58                      pop    %eax
+10427d78:       c3                      ret
+
+104662b0 <__i686.get_pc_thunk.bx>:
+104662b0:       8b 1c 24                mov    (%esp),%ebx
+104662b3:       c3                      ret
+
+10000c6c <.Lbuild_alias.bc_.LBB11_4>:
+10000c6c:       59                      pop    %ecx
+10000c6d:       c3                      ret
+
+100331cb <.Lbuild_c_decl.bc_.LBB20_7>:
+100331cb:       5a                      pop    %edx
+100331cc:       c3                      ret 
+
+100c7e78 <.Lbuild_c_semantics.bc_.LBB9_9>:
+100c7e78:       5e                      pop    %esi
+100c7e79:       c3                      ret   
+
+104124aa <.Lbuild_stringpool.bc_.LBB6_3>:
+104124aa:       83 c4 24                add    $0x24,%esp
+104124ad:       5e                      pop    %esi
+104124ae:       5f                      pop    %edi
+104124af:       c3                      ret 
+
+1003ec30 <stmts_are_full_exprs_p>:
+1003ec30:       50                      push   %eax
+1003ec31:       31 c0                   xor    %eax,%eax
+1003ec33:       5a                      pop    %edx
+1003ec34:       c3                      ret
+
+1504d408 <output_459>:
+1504d408:       52                      push   %edx
+1504d409:       c3                      ret 
+
+104a5180 <_dl_tlsdesc_return>:
+104a5180:       8b 40 04                mov    0x4(%eax),%eax
+104a5183:       c3                      ret
+
+1012ecdc <.Lbuild_explow.bc_.LBB18_8>:
+1012ecdc:       89 11                   mov    %edx,(%ecx)
+1012ecde:       83 c4 04                add    $0x4,%esp
+1012ece1:       5e                      pop    %esi
+1012ece2:       5f                      pop    %edi
+1012ece3:       c3                      ret
+
+10379664 <.Lbuild_regclass.bc_.LBB13_10>:
+10379664:       01 c1                   add    %eax,%ecx
+10379666:       89 0d 20 2b 02 17       mov    %ecx,0x17022b20
+1037966c:       83 c4 30                add    $0x30,%esp
+1037966f:       5e                      pop    %esi
+10379670:       c3                      ret
+
+10024980 <.Lbuild_c_common.bc_.LBB45_1>:
+10024980:       f7 d9                   neg    %ecx
+10024982:       19 c0                   sbb    %eax,%eax
+10024984:       83 c4 0c                add    $0xc,%esp
+10024987:       c3                      ret
+
+102980ae <.Lbuild_insn_output.bc_.LBB117_3>:
+102980ae:       85 c9                   test   %ecx,%ecx
+102980b0:       0f 45 c2                cmovne %edx,%eax
+102980b3:       83 c4 1c                add    $0x1c,%esp
+102980b6:       c3                      ret
+
+1031c690 <.Lbuild_local_alloc.bc_.LBB3_47>:
+1031c690:       85 ed                   test   %ebp,%ebp
+1031c692:       0f 94 c0                sete   %al
+1031c695:       85 db                   test   %ebx,%ebx
+1031c697:       0f 95 c1                setne  %cl
+1031c69a:       20 c1                   and    %al,%cl
+1031c69c:       0f b6 c1                movzbl %cl,%eax
+1031c69f:       01 d0                   add    %edx,%eax
+1031c6a1:       83 c4 2c                add    $0x2c,%esp
+1031c6a4:       5e                      pop    %esi
+1031c6a5:       5f                      pop    %edi
+1031c6a6:       5b                      pop    %ebx
+1031c6a7:       5d                      pop    %ebp
+1031c6a8:       c3                      ret
