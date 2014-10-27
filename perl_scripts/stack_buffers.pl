@@ -2,9 +2,9 @@
 
 use Cwd 'abs_path';
 
-my $stack_slots_tag = "Fixed Stack Slots";
-my $callee_saves_tag = "Callee Save";
-my $name_tag = "Name";
+my $stack_slots_tag = "Fixed Stack Slots: ";
+my $callee_saves_tag = "Callee Save: ";
+my $name_tag = "Name: ";
 my @buff_sizes;
 my @ret_dist;
 
@@ -73,6 +73,9 @@ sub analyze_stack_slots(){
                 next;
             }
 
+            @slots = sort {$b <=> $a} @slots;
+            #push(@slots, 0);
+
             $curr_buff = 0;
             $prev_buff = 0;
 
@@ -86,7 +89,7 @@ sub analyze_stack_slots(){
                     printf ("RET DIST : %d\n",$ret - $curr_buff);
                 }
 
-                if($prev_buff = 0 && $fp - $curr_buff > 8 ){
+                if($prev_buff == 0 && ($fp - $curr_buff > 8) ){
                     push(@buff_sizes, $fp - $curr_buff);
                     push(@ret_dist, $ret - $curr_buff);
                     printf ("BUFF ADDR : %d\n",$curr_buff);
