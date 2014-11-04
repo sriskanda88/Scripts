@@ -1,10 +1,10 @@
-gadgets_file=$1
-reg_to_fill=$2
+value_to_fill=$1
 
-base="/home/skanda/proj/bintrans/run/x86/libquantum"
-out="/home/skanda/scratch/psr_brute_force/x86/libquantum"
+bm="mcf"
+base="/tmp/$bm"
+out="/home/sshamasu/rop/scratch/psr_brute_force/x86/$bm"
 
-for gadget in `cat $gadgets_file`; do
+for gadget in `cat $base/$bm.gadgets`; do
     echo "Executing gadget: $gadget"
-    timeout 5 $base/psr $base/libquantum $gadget $reg_to_fill >> $out/libquantum.$reg_to_fill.out
+    timeout 60 $base/psr -b $base/$bm -g $gadget -v $value_to_fill >> $out/$bm.$value_to_fill.out
 done
