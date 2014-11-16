@@ -1,8 +1,8 @@
-value_to_fill=$1
+bm=$1
+value_to_fill=$2
 
-bm="mcf"
-base="/tmp/$bm"
-out="/home/sshamasu/rop/scratch/psr_brute_force/x86/$bm"
+base="/home/skanda/proj/bintrans/run/x86/$bm"
+out="/home/skanda/scratch/psr_brute_force/x86/$bm"
 
 for gadget in `cat $base/$bm.gadgets`; do
     echo "Executing gadget: $gadget"
