@@ -1,12 +1,17 @@
 #!/usr/bin/perl
 
 use Cwd 'abs_path';
+use constant{BUFFER=>"buffer", SIZE=>"size", RET_DIST=>"ret_dist", OFFSET=>"offset",
+    TOTAL_BUFF_COUNT=>"total_buff_count", TOTAL_BUFF_SIZE=>"total_buff_size",
+    AVG_BUFF_SIZE=>"avg_buff_size" };
 
 my $stack_slots_tag = "Fixed Stack Slots: ";
 my $callee_saves_tag = "Callee Save: ";
 my $name_tag = "Name: ";
-my @buff_sizes;
-my @ret_dist;
+
+my %function_buffers;
+
+sub trim { my $s = shift; $s =~ s/^\s+|\s+$//g; return $s };
 
 sub main(){
     my $filename;
@@ -17,8 +22,7 @@ sub main(){
     }
 
     $filename = $ARGV[0];
-    my $avg_stack_buff_size = analyze_stack_slots(abs_path($filename));
-
+    analyze_stack_slots(abs_path($filename));
 }
 
 sub analyze_stack_slots(){
@@ -33,98 +37,106 @@ sub analyze_stack_slots(){
     open FL, "<$filename" or die "Unable to open lra file for reading";
 
     while($line = <FL>){
-
-        if ($line =~ m/$name_tag/){
-            $func_name = (split(/: /, $line))[1];
+        while (!eof(FL) && $line !~ m/$name_tag(?!.*build_)/){
+            $line = <FL>;
         }
-
-        if ($line eq "\n"){
-            $func_name = "build_";
-            $rec = 0;
-            next;
-        }
-
-        if ($rec == 0 && $func_name !~ m/build_/){
-            $rec = 1;
-        }
-
-        if ($rec != 1){
-            next;
-        }
-
-        if ($line =~ m/$name_tag/  && $func_name !~ m/build_/){
-            print "$func_name";
-        }
+        break if eof(FL);
 
         chomp($line);
+        $func_name = (split(/: /, $line))[1];
+        print "------------------------------------------------------------\n";
+        print "Function : $func_name\n";
 
-        if ($line =~ m/$callee_saves_tag/){
-            $ret = ($line =~ m/\[SP\+([0-9]+)\]\:\%RET/g)[0];
-            $fp = ($line =~ m/\[SP\+([0-9]+)\]\:\%FP/g)[0];
-            print "RET : $ret\n";
-            print "FP : $fp\n";
+        while(!eof(FL) && $line !~ m/$callee_saves_tag/){
+            $line = <FL>;
+        }
+        break if eof(FL);
+
+        $ret = ($line =~ m/\[SP\+([0-9]+)\]\:\%RET/g)[0];
+        $fp = ($line =~ m/\[SP\+([0-9]+)\]\:\%FP/g)[0];
+        print "RET : $ret\n";
+        print "FP : $fp\n";
+        print "\n";
+
+        while(!eof(FL) && $line !~ m/$stack_slots_tag/){
+            $line = <FL>;
+        }
+        break if eof(FL);
+
+        my %slots;
+        my $tmp_count = 0;
+
+        while($line =~ /\[SP\+([0-9]+)\]\:([a-zA-Z0-9 \.]+)/g){
+            my $tmp_name = $2;
+            if ($tmp_name eq " "){
+                $tmp_name = "noname.$tmp_count";
+                $tmp_count++;
+            }
+
+            $tmp_name = trim($tmp_name);
+            if (exists($slots{$tmp_name})){
+                $tmp_name = "$tmp_name.dup";
+            }
+            $slots{$tmp_name} = $1;
         }
 
-        if ($line =~ m/$stack_slots_tag/){
+        if (!%slots){
+            next;
+        }
 
-            @slots = $line =~ m/\[SP\+([0-9]+)\]/g;
-            if (@slots == 0){
+        my $curr_buff_name;
+        my $curr_buff_offset = 0;
+        my $prev_buff_offset = $fp;
+        $function_buffers{$func_name}{TOTAL_BUFF_COUNT} = 0;
+        $function_buffers{$func_name}{TOTAL_BUFF_SIZE} = 0;
+
+        foreach my $slot (sort { $slots{$b} <=> $slots{$a} } keys %slots){
+            $curr_buff_name = $slot;
+            $curr_buff_offset = $slots{$slot};
+
+            #print("$slot -> $slots{$slot}\n");
+
+            if (($prev_buff_offset - $curr_buff_offset) > 8 && $curr_buff_offset < $fp){
+
+                #printf("%s - %s = %s\n", $prev_buff_offset, $curr_buff_offset, $prev_buff_offset - $curr_buff_offset);
+                $function_buffers{$func_name}{$curr_buff_name}{BUFFER} = $curr_buff_name;
+                $function_buffers{$func_name}{$curr_buff_name}{OFFSET} = $curr_buff_offset;
+                $function_buffers{$func_name}{$curr_buff_name}{SIZE} = $prev_buff_offset - $curr_buff_offset;
+                $function_buffers{$func_name}{$curr_buff_name}{RET_DIST} = $ret - $curr_buff_offset;
+
+                $function_buffers{$func_name}{TOTAL_BUFF_COUNT} += 1;
+                $function_buffers{$func_name}{TOTAL_BUFF_SIZE} += $prev_buff_offset - $curr_buff_offset;
+
+                print "BUFF NAME : $function_buffers{$func_name}{$curr_buff_name}{BUFFER}\n";
+                print "BUFF OFFSET : $function_buffers{$func_name}{$curr_buff_name}{OFFSET}\n";
+                print "BUFF SIZE : $function_buffers{$func_name}{$curr_buff_name}{SIZE}\n";
+                print "RET DIST : $function_buffers{$func_name}{$curr_buff_name}{RET_DIST}\n";
                 print "\n";
-                next;
             }
 
-            @slots = sort {$b <=> $a} @slots;
-            #push(@slots, 0);
+            $prev_buff_offset = $curr_buff_offset;
+        }
 
-            $curr_buff = 0;
-            $prev_buff = 0;
-
-            foreach $slot (@slots){
-                $curr_buff = $slot;
-                if ($prev_buff - $curr_buff > 8 && $curr_buff < $fp){
-                    push(@buff_sizes, $prev_buff - $curr_buff);
-                    push(@ret_dist, $ret - $curr_buff);
-                    printf ("BUFF ADDR : %d\n",$curr_buff);
-                    printf ("BUFF SIZE : %d\n",$prev_buff - $curr_buff);
-                    printf ("RET DIST : %d\n",$ret - $curr_buff);
-                }
-
-                if($prev_buff == 0 && ($fp - $curr_buff > 8) ){
-                    push(@buff_sizes, $fp - $curr_buff);
-                    push(@ret_dist, $ret - $curr_buff);
-                    printf ("BUFF ADDR : %d\n",$curr_buff);
-                    printf ("BUFF SIZE : %d\n",$fp - $curr_buff);
-                    printf ("RET DIST : %d\n",$ret - $curr_buff);
-                }
-
-                $prev_buff = $curr_buff;
-            }
-            print "\n";
+        if ($function_buffers{$func_name}{TOTAL_BUFF_COUNT} > 0){
+            $function_buffers{$func_name}{AVG_BUFF_SIZE} = $function_buffers{$func_name}{TOTAL_BUFF_SIZE} / $function_buffers{$func_name}{TOTAL_BUFF_COUNT};
+            print "TOTAL BUFF SIZE : $function_buffers{$func_name}{TOTAL_BUFF_SIZE}\n";
+            print "AVG BUFF SIZE : $function_buffers{$func_name}{AVG_BUFF_SIZE}\n";
         }
     }
 
-    my $buff_sum, $dist_sum = 0;
-    my $buff_count = scalar(@buff_sizes);
-    my $dist_count = scalar(@ret_dist);
+    close(FP);
 
-    foreach $buff (@buff_sizes){
-        $buff_sum += $buff;
+    my $func_buff_sum = 0;
+    my $func_count = 0;
+
+    foreach my $func (keys %function_buffers){
+        $func_count++;
+        $func_buff_sum += $function_buffers{$func}{TOTAL_BUFF_SIZE};
     }
-    foreach $ret_dist (@ret_dist){
-        $dist_sum += $ret_dist;
-    }
+
     print "\n";
-    print "Total Buff Size : $buff_sum\n";
-    print "Count : $buff_count\n";
-    print "Total Ret Dist : $dist_sum\n";
-    print "Count : $dist_count\n";
-
-    my $avg_buff_size = $buff_sum/$buff_count;
-    my $avg_ret_dist = $dist_sum/$dist_count;
-    print "Avg stack buffer size : $avg_buff_size\n";
-    print "Avg distance to ret : $avg_ret_dist\n";
-
-    return $buff_sum/$buff_count;
+    printf("Total Functions : %d\n", $func_count);
+    printf("Average Buff Size per Function: %d\n", $func_buff_sum/$func_count);
 }
 
 main();
