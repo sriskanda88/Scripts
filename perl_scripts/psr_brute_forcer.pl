@@ -4,7 +4,7 @@ use Data::Dumper;
 use Math::Combinatorics;
 use Statistics::Basic qw(:all);
 use constant{GADGET=>"gadget", CLOBBER=>"clobber", STACK_MOD=>"stack_mod", RET_ADDR=>"ret_addr", FRAME_SIZE=>"frame_size", SUCCESS=>"success", TIME=>"time", NULL=>"null"};
-use constant{DEBUG=>(0), DUMP=>(0), CHECK_STACK_CLOBBER=>(0), JITROP=>(0)};
+use constant{DEBUG=>(0), DUMP=>(0), CHECK_STACK_CLOBBER=>(1), JITROP=>(0)};
 
 my @full_reg_list = ("eax", "ecx", "edx", "ebx", "esp", "ebp", "esi", "edi");
 my @reg_list = ("eax", "ecx", "edx", "ebx", "ebp", "esi", "edi");
